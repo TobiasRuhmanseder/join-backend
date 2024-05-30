@@ -8,8 +8,8 @@ from join.serializers import BoardSerializer
 from join.serializers import TaskSerializer
 from join.permissions import IsBoardUser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
-
+from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
 
 """
     Handles user authentication and token generation.
@@ -18,13 +18,15 @@ from rest_framework.permissions import AllowAny
         post: Authenticates the user and returns an authentication token.
 """
 class LoginView(ObtainAuthToken):
-    permission_classes = [AllowAny]
     # serializer_class = [AuthTokenSerializer] ## man könnte zusätzlich noch einen Serializer für eine bessere Validierung verwenden
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                             context={'request': request})
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except AuthenticationFailed:
+            return Response({'non_field_errors': ['Unable to log in with provided credentials.']}, status=status.HTTP_401_UNAUTHORIZED)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
