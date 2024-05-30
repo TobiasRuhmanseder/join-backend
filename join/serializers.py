@@ -6,14 +6,7 @@ from join.models import Task
 
 
 """
-    Serializer for the Board model.
-    
-    Attributes:
-        id (int): The ID of the board.
-        title (str): The title of the board.
-        description (str): The description of the board.
-        created_at (date): The creation date of the board.
-        users (list): The users associated with the board.
+    Serializer for the Board model.  
 """
 class BoardSerializer(serializers.HyperlinkedModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
@@ -24,18 +17,8 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
 
 
 """
-    Serializer for the Task model.
-    
-    Attributes:
-        id (int): The ID of the task.
-        title (str): The title of the task.
-        description (str): The description of the task.
-        created_at (date): The creation date of the task.
-        priority (str): The priority level of the task.
-        board (int): The ID of the board associated with the task.
-        users (list): The users associated with the task.
-        subtasks (str): The subtasks within the task.
-    """
+    Serializer for the Task model. 
+"""
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
     board = serializers.PrimaryKeyRelatedField(queryset=Board.objects.all())
@@ -43,4 +26,45 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Task
         fields = ['id','title','description','created_at','priority','board','users','subtasks']
+
+
+"""
+    Serializer for creating a new user.
+"""
+class UserCreateSerializer(serializers.ModelSerializer):
+   
+    username = serializers.CharField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password')
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username is already taken.")
+        return value
+
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+"""
+    Serializer for the User model.
+"""
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'email']
 

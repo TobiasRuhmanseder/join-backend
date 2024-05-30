@@ -9,7 +9,12 @@ from join.serializers import TaskSerializer
 from join.permissions import IsBoardUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
-
+from .serializers import UserCreateSerializer, UserSerializer
+from django.contrib.auth.models import User
+from rest_framework import viewsets
+from rest_framework import generics
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import status
 
 """
     Handles user authentication and token generation.
@@ -18,12 +23,14 @@ from rest_framework.permissions import AllowAny
         post: Authenticates the user and returns an authentication token.
 """
 class LoginView(ObtainAuthToken):
-    # serializer_class = [AuthTokenSerializer] ## man könnte zusätzlich noch einen Serializer für eine bessere Validierung verwenden
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
-                                            context={'request': request})
-        serializer.is_valid(raise_exception=True)
+                                            context={'request': request}) 
+      
+        if not serializer.is_valid():
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+        
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
@@ -68,3 +75,27 @@ class TaskView(APIView):
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True, context={'request': request})
         return Response(serializer.data)
+
+"""
+    API View to create a new user.
+    """
+class UserCreateView(generics.CreateAPIView):
+    
+    serializer_class = UserCreateSerializer
+    permission_classes = [AllowAny]
+
+
+"""
+    A viewset for viewing and editing user instances.
+"""
+class UserViewSet(viewsets.ModelViewSet):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Save the new user instance.
+        """
+        serializer.save(user=self.request.user)
