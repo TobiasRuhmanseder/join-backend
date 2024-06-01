@@ -2,14 +2,14 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from join.models import Board
+from join.models import Board, TaskCategory
 from join.models import Task
 from join.serializers import BoardSerializer
 from join.serializers import TaskSerializer
 from join.permissions import IsBoardUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
-from .serializers import UserCreateSerializer, UserSerializer
+from .serializers import TaskCategorySerializer, UserCreateSerializer, UserSerializer
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework import generics
@@ -27,7 +27,6 @@ class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                             context={'request': request}) 
-      
         if not serializer.is_valid():
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
         
@@ -94,8 +93,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        """
-        Save the new user instance.
-        """
-        serializer.save(user=self.request.user)
+class TaskCategoryViewSet(viewsets.ModelViewSet):
+
+    queryset = TaskCategory.objects.all()
+    serializer_class = TaskCategorySerializer
+    permission_classes = [IsAuthenticated]

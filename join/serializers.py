@@ -25,7 +25,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Task
-        fields = ['id','title','description','created_at','priority','board','users','subtasks']
+        fields = ['id','title','description','users','due_date','priority','board','subtasks']
 
 
 """
@@ -68,3 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
 
+class TaskCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'category', 'color']

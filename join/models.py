@@ -1,16 +1,12 @@
 import datetime
+from unicodedata import category
 from django.db import models
 from django.contrib.auth.models import User
 
+
 """
     Represents a board which contains tasks.
-    
-    Attributes:
-        title (str): A short title for the board.
-        description (str): A detailed description of the board.
-        created_at (date): The date when the board was created.
-        users (ManyToManyField): A list of users associated with the board.
-    """
+"""
 class Board(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=200)
@@ -21,25 +17,39 @@ class Board(models.Model):
         return self.title
     
 """
+    Represents a task category
+"""
+class TaskCategory(models.Model): 
+    category = models.CharField(max_length=30)
+    color = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.category
+"""
     Represents a task within a board.
-    
-    Attributes:
-        title (str): A short title for the task.
-        description (str): A detailed description of the task.
-        created_at (date): The date when the task was created.
-        priority (str): The priority level of the task.
-        board (ForeignKey): The board to which the task belongs.
-        users (ManyToManyField): A list of users associated with the task.
-        subtasks (str): A list of subtasks within the task.
-    """
+"""
 class Task(models.Model):
+    STATUS_CHOICES = [
+        ('todo', 'To Do'),
+        ('inprogress', 'In Progress'),
+        ('awaitfeedback', 'Awaiting Feedback'),
+        ('done', 'Done'),
+    ]
+    PRIO_CHOICES = [
+        ('urgent','urgent' ),
+        ('medium','medium'),
+        ('low',"low"),
+    ]
+
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=200)
-    created_at = models.DateField(("Date"), default=datetime.date.today)
-    priority = models.CharField(max_length=20, default='todo')
-    board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE)
     users = models.ManyToManyField(User, related_name='tasks') 
+    due_date = models.DateField(("Date"), default=datetime.date.today)
+    priority = models.CharField(max_length=20, choices=PRIO_CHOICES, default='low')
+    category = models.ForeignKey(TaskCategory, related_name='tasks', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE)
     subtasks = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo')
 
     def __str__(self):
         return self.title
