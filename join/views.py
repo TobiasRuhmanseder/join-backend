@@ -45,8 +45,8 @@ class LoginView(ObtainAuthToken):
     Permissions:
         Requires the user to be authenticated and to have access to the board.
 """
-class BoardView(APIView):
-    # queryset = Board.objects.all().order_by('-created_at')
+class BoardViewSet(viewsets.ModelViewSet):
+    queryset = Board.objects.all().order_by('-created_at')
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated, IsBoardUser]
 
@@ -65,21 +65,15 @@ class BoardView(APIView):
     Permissions:
         Requires the user to be authenticated.
 """
-class TaskView(APIView):
-    # queryset = Task.objects.all().order_by('-created_at')
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True, context={'request': request})
-        return Response(serializer.data)
 
 """
     API View to create a new user.
     """
 class UserCreateView(generics.CreateAPIView):
-    
     serializer_class = UserCreateSerializer
     permission_classes = [AllowAny]
 
@@ -88,13 +82,11 @@ class UserCreateView(generics.CreateAPIView):
     A viewset for viewing and editing user instances.
 """
 class UserViewSet(viewsets.ModelViewSet):
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
 class TaskCategoryViewSet(viewsets.ModelViewSet):
-
     queryset = TaskCategory.objects.all()
     serializer_class = TaskCategorySerializer
     permission_classes = [IsAuthenticated]

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from join.models import Board
+from join.models import Board, TaskCategory
 from join.models import Task
 
 
@@ -22,10 +22,10 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
     board = serializers.PrimaryKeyRelatedField(queryset=Board.objects.all())
-
+    category = serializers.PrimaryKeyRelatedField(queryset=TaskCategory.objects.all())
     class Meta:
         model = Task
-        fields = ['id','title','description','users','due_date','priority','board','subtasks']
+        fields = ['id','title','description','users','due_date','priority','category','board','subtasks', 'status']
 
 
 """
@@ -70,5 +70,5 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TaskCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = TaskCategory
         fields = ['id', 'category', 'color']

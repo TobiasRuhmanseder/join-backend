@@ -2,6 +2,7 @@ import datetime
 from unicodedata import category
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import JSONField
 
 
 """
@@ -48,7 +49,7 @@ class Task(models.Model):
     priority = models.CharField(max_length=20, choices=PRIO_CHOICES, default='low')
     category = models.ForeignKey(TaskCategory, related_name='tasks', on_delete=models.CASCADE)
     board = models.ForeignKey(Board, related_name='tasks', on_delete=models.CASCADE)
-    subtasks = models.TextField(blank=True, null=True)
+    subtasks = models.JSONField(default=list, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo')
 
     def __str__(self):
