@@ -18,4 +18,5 @@ urlpatterns = [
     path('api/login/', views.LoginView.as_view(), name='api_login_auth'),
     path('api/signup/', views.UserCreateView.as_view(), name='user_create'),
     path('api/current_user/', views.CurrentUserView.as_view(), name='user_create'),
+    path('api/guest_exists/', views.GuestUserExistsView.as_view(), name='guest_exists'),
 ]

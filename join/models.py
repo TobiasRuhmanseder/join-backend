@@ -5,10 +5,11 @@ from django.contrib.auth.models import User
 from django.forms import JSONField
 
 
-"""
-    Represents a board which contains tasks.
-"""
+
 class Board(models.Model):
+    """
+    Represents a board which contains tasks.
+    """
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=200)
     created_at = models.DateField(("Date"), default=datetime.date.today)
@@ -17,19 +18,20 @@ class Board(models.Model):
     def __str__(self):
         return self.title
     
-"""
-    Represents a task category
-"""
 class TaskCategory(models.Model): 
+    """
+    Represents a task category
+    """
     category = models.CharField(max_length=30)
     color = models.CharField(max_length=30)
 
     def __str__(self):
         return self.category
-"""
-    Represents a task within a board.
-"""
+
 class Task(models.Model):
+    """
+    Represents a task within a board.
+    """
     STATUS_CHOICES = [
         ('todo', 'To Do'),
         ('inprogress', 'In Progress'),
@@ -43,7 +45,7 @@ class Task(models.Model):
     ]
 
     title = models.CharField(max_length=30)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
     users = models.ManyToManyField(User, related_name='tasks') 
     due_date = models.DateField(("Date"), default=datetime.date.today)
     priority = models.CharField(max_length=20, choices=PRIO_CHOICES, default='low')
