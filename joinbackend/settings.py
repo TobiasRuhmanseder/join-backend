@@ -52,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'join.middleware.IgnoreInvalidTokenMiddleware',
 ]
 
 ROOT_URLCONF = 'joinbackend.urls'

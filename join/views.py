@@ -51,7 +51,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated,] #Use "isboardUser" permission when expanding to multiple boards
 
-    @action(detail=False, methods=['post'], url_path='check_board_default', permission_classes=[AllowAny])
+    @action(detail=False, methods=['post'], url_path='check_board_default', permission_classes=[AllowAny], authentication_classes = [])
     def check_and_create_board(self, request):
         """
         check if a Baord with a specific ID exists, and create it if it doesn't.
@@ -97,6 +97,7 @@ class CurrentUserView(APIView):
     """
     A view for getting the current User data.
     """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -108,8 +109,8 @@ class GuestUserExistsView(APIView):
     """
     A view for checking the exists from a guest user
     """
+    authentication_classes = []
     permission_classes = [AllowAny]
-
     def get(self, request):
         exists = User.objects.filter(username='guest').exists()
         return Response({'exists': exists}, status=status.HTTP_200_OK)
