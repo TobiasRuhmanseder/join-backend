@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/signup/', views.UserCreateView.as_view(), name='user_create'),
     path('api/current_user/', views.CurrentUserView.as_view(), name='user_create'),
     path('api/guest_exists/', views.GuestUserExistsView.as_view(), name='guest_exists'),
+    path('api/check_token/', views.CheckTokenView.as_view(), name='check_token')
 ]

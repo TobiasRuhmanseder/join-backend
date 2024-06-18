@@ -84,6 +84,7 @@ class UserCreateView(generics.CreateAPIView):
     """
     serializer_class = UserCreateSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -122,3 +123,29 @@ class TaskCategoryViewSet(viewsets.ModelViewSet):
     queryset = TaskCategory.objects.all()
     serializer_class = TaskCategorySerializer
     permission_classes = [IsAuthenticated]
+
+class CheckTokenView(APIView):
+    """
+    This ckass checks if a provided token exists and is valid.
+
+    It allows anyone to access this endpoint without authentication
+    """
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        """
+        Handles POST requests to check iff a token is valid.
+
+        The token should be provided in de body of the request.
+        """
+        token_key= request.data.get('token', None)
+
+        if token_key:
+            try:
+                token = Token.objects.get(key=token_key)
+                return Response({'message': 'Token exists'})
+            except Token.DoesNotExist:
+                return Response({'error': 'Invalid token'})
+        else:
+                return Response({'error': 'No token provided'})
